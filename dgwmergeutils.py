@@ -12,6 +12,14 @@ STRINGS = {
     'MERGE_DONE':   "Merged %s into %s.",
 }
 
+STATS = (
+    'bomb_wrongs',
+    'bomb_timeouts',
+    'bomb_defuses',
+    'bomb_alls',
+    'bombs_planted',
+)
+
 
 @commands('nickmerge')
 @example(".nickmerge newbie into old_friend")
@@ -28,7 +36,7 @@ def is_really(bot, trigger):
     duplicate = Identifier(duplicate)
     primary = Identifier(primary)
     newstats = dict()
-    for stat in ('bomb_wrongs', 'bomb_timeouts', 'bomb_defuses', 'bomb_alls', 'bombs_planted'):
+    for stat in STATS:
         dupval = bot.db.get_nick_value(duplicate, stat) or 0
         prival = bot.db.get_nick_value(primary, stat) or 0
         newstats[stat] = dupval + prival
