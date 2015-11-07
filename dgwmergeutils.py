@@ -18,6 +18,8 @@ STATS = (
     'bomb_defuses',
     'bomb_alls',
     'bombs_planted',
+    'duel_wins',
+    'duel_losses',
 )
 
 
