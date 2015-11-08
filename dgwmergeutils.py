@@ -20,6 +20,7 @@ STATS = (
     'bombs_planted',
     'duel_wins',
     'duel_losses',
+    'rep_score',
 )
 
 
