@@ -23,6 +23,13 @@ STATS = (
     'rep_score',
 )
 
+RATES = (
+    'bomb_last_planted',
+    'duel_last',
+    'rep_used',
+    'roulette_last',
+)
+
 
 @commands('nickmerge')
 @example(".nickmerge newbie into old_friend")
@@ -43,6 +50,10 @@ def is_really(bot, trigger):
         dupval = bot.db.get_nick_value(duplicate, stat) or 0
         prival = bot.db.get_nick_value(primary, stat) or 0
         newstats[stat] = dupval + prival
+    for rate in RATES:
+        dupval = bot.db.get_nick_value(duplicate, rate) or 0
+        prival = bot.db.get_nick_value(primary, rate) or 0
+        newstats[rate] = prival if (prival > dupval) else dupval
     for stat in newstats:
         bot.db.set_nick_value(primary, stat, newstats[stat])
         bot.db.set_nick_value(duplicate, stat, 0)  # because willie < 5.4.1 doesn't merge properly
