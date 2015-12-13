@@ -21,6 +21,8 @@ STATS = (
     'duel_wins',
     'duel_losses',
     'rep_score',
+    'roulette_games',
+    'roulette_wins',
 )
 
 RATES = (
