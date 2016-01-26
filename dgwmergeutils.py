@@ -10,6 +10,8 @@ STRINGS = {
     'MERGE_SYNTAX': "I want to be sure there are no mistakes here. "
                     "Please specify nicks to merge as: <duplicate> into <primary>",
     'MERGE_DONE':   "Merged %s into %s.",
+    'MERGE_GROUPED': "Nicks %s & %s are already grouped.",
+    'MERGE_UNKNOWN': "Encountered unknown nick. Aborting merge.",
 }
 
 STATS = (
@@ -47,6 +49,13 @@ def is_really(bot, trigger):
         return
     duplicate = Identifier(duplicate)
     primary = Identifier(primary)
+    try:
+        if bot.db.get_nick_id(duplicate, False) == bot.db.get_nick_id(primary, False):
+            bot.reply(STRINGS['MERGE_GROUPED'] % (primary, duplicate))
+            return
+    except ValueError:
+        bot.reply(STRINGS['MERGE_UNKNOWN'])
+        return
     newstats = dict()
     for stat in STATS:
         dupval = bot.db.get_nick_value(duplicate, stat) or 0
