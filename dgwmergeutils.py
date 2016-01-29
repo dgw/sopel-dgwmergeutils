@@ -6,10 +6,10 @@ from willie.module import commands, example, require_owner
 from willie.tools import Identifier
 
 STRINGS = {
-    'OWNER_MERGE':  "Only the bot owner can merge users.",
-    'MERGE_SYNTAX': "I want to be sure there are no mistakes here. "
-                    "Please specify nicks to merge as: <duplicate> into <primary>",
-    'MERGE_DONE':   "Merged %s into %s.",
+    'OWNER_MERGE':   "Only the bot owner can merge users.",
+    'MERGE_SYNTAX':  "I want to be sure there are no mistakes here. "
+                     "Please specify nicks to merge as: <duplicate> into <primary>",
+    'MERGE_DONE':    "Merged %s into %s.",
     'MERGE_GROUPED': "Nicks %s & %s are already grouped.",
     'MERGE_UNKNOWN': "Encountered unknown nick. Aborting merge.",
 }
