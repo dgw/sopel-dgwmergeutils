@@ -2,8 +2,8 @@
 Utility to go with my games, in case you want to merge duplicate users
 created when people play with different nicks, accidentally or otherwise.
 """
-from willie.module import commands, example, require_owner
-from willie.tools import Identifier
+from sopel.module import commands, example, require_owner
+from sopel.tools import Identifier
 
 STRINGS = {
     'OWNER_MERGE':   "Only the bot owner can merge users.",
