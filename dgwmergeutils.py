@@ -70,3 +70,15 @@ def is_really(bot, trigger):
         bot.db.set_nick_value(duplicate, stat, 0)  # because willie < 5.4.1 doesn't merge properly
     bot.db.merge_nick_groups(primary, duplicate)
     bot.say(STRINGS['MERGE_DONE'] % (duplicate, primary))
+
+
+@commands('nickunmerge')
+@example(".nickunmerge DeadAlias")
+@require_owner("Only the bot owner can unmerge nicks.")
+def isnt_anymore(bot, trigger):
+    """
+    Remove the given nick from its nick group, allowing it to be relearned as a new user.
+    """
+    target = trigger.group(3)
+    bot.say("Removing %s from nick group %s" % (target, bot.db.get_nick_id(target)))
+    bot.db.unalias_nick(target)
