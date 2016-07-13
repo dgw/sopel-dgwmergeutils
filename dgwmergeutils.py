@@ -6,12 +6,17 @@ from sopel.module import commands, example, require_owner
 from sopel.tools import Identifier
 
 STRINGS = {
-    'OWNER_MERGE':   "Only the bot owner can merge users.",
-    'MERGE_SYNTAX':  "I want to be sure there are no mistakes here. "
-                     "Please specify nicks to merge as: <duplicate> into <primary>",
-    'MERGE_DONE':    "Merged %s into %s.",
-    'MERGE_GROUPED': "Nicks %s & %s are already grouped.",
-    'MERGE_UNKNOWN': "Encountered unknown nick. Aborting merge.",
+    'OWNER_MERGE':     "Only the bot owner can merge users.",
+    'MERGE_SYNTAX':    "I want to be sure there are no mistakes here. "
+                       "Please specify nicks to merge as: <duplicate> into <primary>",
+    'MERGE_DONE':      "Merged %s into %s.",
+    'MERGE_GROUPED':   "Nicks %s & %s are already grouped.",
+    'MERGE_UNKNOWN':   "Encountered unknown nick. Aborting merge.",
+    'OWNER_UNMERGE':   "Only the bot owner can unmerge nicks.",
+    'UNMERGE_SYNTAX':  "I need a nickname to unmerge.",
+    'NOT_GROUPED':     "Nick group %s contains only one nick; nothing to do.",
+    'UNMERGE_UNKNOWN': "Encountered unknown nick. Aborting unmerge.",
+    'UNMERGE_DONE':    "Removed %s from nick group %s.",
 }
 
 STATS = (
@@ -74,11 +79,23 @@ def is_really(bot, trigger):
 
 @commands('nickunmerge')
 @example(".nickunmerge DeadAlias")
-@require_owner("Only the bot owner can unmerge nicks.")
+@require_owner(STRINGS['OWNER_UNMERGE'])
 def isnt_anymore(bot, trigger):
     """
     Remove the given nick from its nick group, allowing it to be relearned as a new user.
     """
-    target = trigger.group(3)
-    bot.say("Removing %s from nick group %s" % (target, bot.db.get_nick_id(target)))
-    bot.db.unalias_nick(target)
+    if not trigger.group(3):
+        bot.say(STRINGS['UNMERGE_SYNTAX'])
+        return
+    target = Identifier(trigger.group(3))
+    try:
+        group = bot.db.get_nick_id(target, False)
+    except ValueError:  # no ID exists for this nick; it's unknown
+        bot.say(STRINGS['UNMERGE_UNKNOWN'])
+        return
+    try:
+        bot.db.unalias_nick(target)
+    except ValueError:  # the nick is in a group by itself
+        bot.say(STRINGS['NOT_GROUPED'] % group)
+    else:  # no exception means it's fine
+        bot.say(STRINGS['UNMERGE_DONE'] % (target, group))
