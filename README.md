@@ -1,4 +1,4 @@
-# dgwmergeutils.py
+# sopel-dgwmergeutils
 
 This module provides a command for bot owners to merge nicks into groups, as supported
 by `bot.db` in willie/sopel, and combine their stats for dgw's custom game modules at
