@@ -17,6 +17,10 @@ STRINGS = {
     'NOT_GROUPED':     "Nick group %s contains only one nick; nothing to do.",
     'UNMERGE_UNKNOWN': "Encountered unknown nick. Aborting unmerge.",
     'UNMERGE_DONE':    "Removed %s from nick group %s.",
+    'GLIST_SYNTAX':    "I need a nickname to look up.",
+    'GLIST_BY_NICK':   "Other nicks in %s's group: %s.",
+    'GLIST_FAILED':    "Could not find nick group for %s.",
+    'GLIST_EMPTY':     "No nicks grouped with %s.",
 }
 
 STATS = (
@@ -101,3 +105,26 @@ def isnt_anymore(bot, trigger):
         bot.say(STRINGS['NOT_GROUPED'] % group)
     else:  # no exception means it's fine
         bot.say(STRINGS['UNMERGE_DONE'] % (target, group))
+
+
+@commands('shownickgroup')
+@example(".shownickgroup AlsoKnownAsNil")
+def also_known_as(bot, trigger):
+    """
+    Show the nicks grouped with the specified nick in the database.
+    """
+    if not trigger.group(3):
+        bot.say(STRINGS['GLIST_SYNTAX'])
+        return
+    target = Identifier(trigger.group(3))
+    try:
+        gid = bot.db.get_nick_id(target, create=False)
+    except ValueError:
+        bot.say(STRINGS['GLIST_FAILED'] % target)
+        return
+    res = bot.db.execute("SELECT canonical from nicknames where nick_id=%d;" % gid)
+    nicks = [Identifier(row[0]) for row in res.fetchall() if row[0] != target]
+    if len(nicks):
+        bot.say(STRINGS['GLIST_BY_NICK'] % (target, ', '.join(nicks) or '(none)'))
+    else:
+        bot.say(STRINGS['GLIST_EMPTY'] % target)
