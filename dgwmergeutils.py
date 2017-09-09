@@ -18,6 +18,7 @@ STRINGS = {
     'UNMERGE_UNKNOWN': "Encountered unknown nick. Aborting unmerge.",
     'UNMERGE_DONE':    "Removed %s from nick group %s.",
     'GLIST_SYNTAX':    "I need a nickname to look up.",
+    'GLIST_BY_ID':     "Nicks in group %s: %s.",
     'GLIST_BY_NICK':   "Other nicks in %s's group: %s.",
     'GLIST_FAILED':    "Could not find nick group for %s.",
     'GLIST_EMPTY':     "No nicks grouped with %s.",
@@ -109,6 +110,7 @@ def isnt_anymore(bot, trigger):
 
 @commands('shownickgroup')
 @example(".shownickgroup AlsoKnownAsNil")
+@example(".shownickgroup 1337")
 def also_known_as(bot, trigger):
     """
     Show the nicks grouped with the specified nick in the database.
@@ -117,14 +119,30 @@ def also_known_as(bot, trigger):
         bot.say(STRINGS['GLIST_SYNTAX'])
         return
     target = Identifier(trigger.group(3))
+    id_lookup = False
     try:
         gid = bot.db.get_nick_id(target, create=False)
     except ValueError:
-        bot.say(STRINGS['GLIST_FAILED'] % target)
-        return
+        if target.isdigit():
+            gid = int(target)
+            id_lookup = True
+        else:
+            bot.say(STRINGS['GLIST_FAILED'] % target)
+            return
     res = bot.db.execute("SELECT canonical from nicknames where nick_id=%d;" % gid)
-    nicks = [Identifier(row[0]) for row in res.fetchall() if row[0] != target]
+    nicks = [Identifier(row[0]) for row in res.fetchall()]
+
     if len(nicks):
-        bot.say(STRINGS['GLIST_BY_NICK'] % (target, ', '.join(nicks) or '(none)'))
+        if id_lookup:
+            bot.say(STRINGS['GLIST_BY_ID'] % (target, ', '.join(nicks)))
+        else:
+            try:
+                nicks.remove(target)
+            except ValueError:
+                pass  # not a big deal if the queried nick can't be removed, really
+            if len(nicks):  # second check to show different message for single-nick groups
+                bot.say(STRINGS['GLIST_BY_NICK'] % (target, ', '.join(nicks)))
+            else:
+                bot.say(STRINGS['GLIST_EMPTY'] % target)
     else:
-        bot.say(STRINGS['GLIST_EMPTY'] % target)
+        bot.say(STRINGS['GLIST_FAILED'] % target)
